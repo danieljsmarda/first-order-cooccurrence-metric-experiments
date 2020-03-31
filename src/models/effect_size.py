@@ -52,13 +52,8 @@ def get_complements(x_union_y):
     '''Generator function that yields pairs of equal-size disjoint subsets
     of x_union_y.
     x_union_y should a set type.'''
-    already_seen = set()
     for seq in combinations(x_union_y, len(x_union_y)//2):
         complement = frozenset(x_union_y.difference(seq))
-        #already_seen.append(complement)
-        already_seen.add(complement)
-        #if frozenset(seq) in already_seen:
-            #continue
         yield (seq, complement)
 
 def produce_p_value(wv_obj, X_terms, Y_terms, A_terms, B_terms):
@@ -68,12 +63,6 @@ def produce_p_value(wv_obj, X_terms, Y_terms, A_terms, B_terms):
     x_union_y = set(X_terms).union(set(Y_terms))
     total_terms = len(x_union_y)
     comparison_statistic = produce_test_statistic(wv_obj, X_terms, Y_terms, A_terms, B_terms)
-    '''
-    for (X_i_terms, Y_i_terms) in tqdm(get_complements(x_union_y), total=num_combinations(total_terms, total_terms/2)):
-        total_pairs += 1
-        test_statistic = produce_test_statistic(wv_obj, X_i_terms, Y_i_terms, A_terms, B_terms)
-        if (test_statistic > comparison_statistic): high_test_statistics += 1
-    '''
     dist = np.array([])
     for (X_i_terms, Y_i_terms) in tqdm(get_complements(x_union_y), total=num_combinations(total_terms, total_terms/2)):
         test_statistic = produce_test_statistic(wv_obj, X_i_terms, Y_i_terms, A_terms, B_terms)
