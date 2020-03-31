@@ -1,7 +1,11 @@
 from gensim.test.utils import datapath
 from gensim.models import KeyedVectors
 from scipy.spatial.distance import cosine as cosine_distance
+from scipy.special import comb as num_combinations
+from itertools import combinations
+from tqdm import tqdm
 import numpy as np
+import scipy as sp
 
 def word_set_to_mtx(wv_obj, word_set):
     '''Converts set of string words into a 2-D numpy array of word vectors from the word-vector object.'''
@@ -63,11 +67,15 @@ def produce_p_value(wv_obj, X_terms, Y_terms, A_terms, B_terms):
     notebooks for experimentation.'''
     x_union_y = set(X_terms).union(set(Y_terms))
     total_terms = len(x_union_y)
-    total_pairs = 0
-    high_test_statistics = 0
     comparison_statistic = produce_test_statistic(wv_obj, X_terms, Y_terms, A_terms, B_terms)
+    '''
     for (X_i_terms, Y_i_terms) in tqdm(get_complements(x_union_y), total=num_combinations(total_terms, total_terms/2)):
         total_pairs += 1
         test_statistic = produce_test_statistic(wv_obj, X_i_terms, Y_i_terms, A_terms, B_terms)
         if (test_statistic > comparison_statistic): high_test_statistics += 1
-    return (float(high_test_statistics) / float(total_pairs))
+    '''
+    dist = np.array([])
+    for (X_i_terms, Y_i_terms) in tqdm(get_complements(x_union_y), total=num_combinations(total_terms, total_terms/2)):
+        test_statistic = produce_test_statistic(wv_obj, X_i_terms, Y_i_terms, A_terms, B_terms)
+        dist = np.append(dist, test_statistic)
+    return 1 - sp.stats.norm.cdf(comparison_statistic, loc=np.mean(dist), scale=np.std(dist, ddof=1))
