@@ -3,6 +3,7 @@ from gensim.models import KeyedVectors
 from scipy.spatial.distance import cosine as cosine_distance
 from scipy.special import comb as num_combinations
 from itertools import combinations
+from functools import lru_cache
 from tqdm import tqdm
 from statistics import mean
 import numpy as np
@@ -71,8 +72,10 @@ def produce_2ndorder_p_value(wv_obj, X_terms, Y_terms, A_terms, B_terms):
     return 1 - sp.stats.norm.cdf(comparison_statistic, loc=np.mean(dist), scale=np.std(dist, ddof=1))
 
 ############## 1st-order #####################
-def get_expSG_vecs(words, we_model, E_ctx_vec, E_wrd_vec):
-    
+@lru_cache(maxsize=None)
+def get_expSG_vecs(words, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
+    E_ctx_vec = np.array(E_ctx_vec_tup)
+    E_wrd_vec = np.array(E_wrd_vec_tup)
     expSG_vecs = {}
     for word in words:
         _idx = we_model.wv.vocab[word].index
@@ -84,8 +87,11 @@ def get_expSG_vecs(words, we_model, E_ctx_vec, E_wrd_vec):
     
     return expSG_vecs
 
-def get_expSG_1storder_relation(word_from, words_to, we_model, E_ctx_vec, E_wrd_vec):
-    expSG_vec = get_expSG_vecs([word_from], we_model, E_ctx_vec, E_wrd_vec)[word_from]
+@lru_cache(maxsize=None)
+def get_expSG_1storder_relation(word_from, words_to, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
+    E_ctx_vec = np.array(E_ctx_vec_tup)
+    E_wrd_vec = np.array(E_wrd_vec_tup)
+    expSG_vec = get_expSG_vecs(tuple([word_from]), we_model, E_ctx_vec_tup, E_wrd_vec_tup)[word_from]
     
     relations={}
     for word_to in words_to:
@@ -95,28 +101,33 @@ def get_expSG_1storder_relation(word_from, words_to, we_model, E_ctx_vec, E_wrd_
     
     return relations
 
-def get_1storder_association_metric(word, A_terms, B_terms, we_model, E_ctx_vec, E_wrd_vec):
-    A_relations = get_expSG_1storder_relation(word, A_terms, we_model, E_ctx_vec, E_wrd_vec)
-    B_relations = get_expSG_1storder_relation(word, B_terms, we_model, E_ctx_vec, E_wrd_vec)
+@lru_cache(maxsize=None)
+def get_1storder_association_metric(word, A_terms, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
+    E_ctx_vec = np.array(E_ctx_vec_tup)
+    E_wrd_vec = np.array(E_wrd_vec_tup)
+    A_relations = get_expSG_1storder_relation(word, A_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
+    B_relations = get_expSG_1storder_relation(word, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
     return mean(A_relations.values()) - mean(B_relations.values())
 
-def produce_1storder_effect_size_unnormalized(X_terms, Y_terms, A_terms, B_terms, we_model, E_ctx_vec, E_wrd_vec):
+@lru_cache(maxsize=None)
+def produce_1storder_effect_size_unnormalized(X_terms, Y_terms, A_terms, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
     x_associations = np.array([])
     y_associations = np.array([])
     for (x,y) in zip(X_terms, Y_terms):
-        x_association = get_1storder_association_metric(x, A_terms, B_terms, we_model, E_ctx_vec, E_wrd_vec)
-        y_association = get_1storder_association_metric(y, A_terms, B_terms, we_model, E_ctx_vec, E_wrd_vec)
+        x_association = get_1storder_association_metric(x, A_terms, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
+        y_association = get_1storder_association_metric(y, A_terms, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
         x_associations = np.append(x_associations, x_association)
         y_associations = np.append(y_associations, y_association)
     all_associations = np.append(x_associations, y_associations)
     return (np.mean(x_associations) - np.mean(y_associations))/np.std(all_associations, ddof=1)
 
-def produce_1storder_test_statistic(we_model, X_terms, Y_terms, A_terms, B_terms, E_ctx_vec, E_wrd_vec):
+@lru_cache(maxsize=None)
+def produce_1storder_test_statistic(we_model, X_terms, Y_terms, A_terms, B_terms, E_ctx_vec_tup, E_wrd_vec_tup):
     x_associations = np.array([])
     y_associations = np.array([])
     for (x,y) in zip(X_terms, Y_terms):
-        x_association = get_1storder_association_metric(x, A_terms, B_terms, we_model, E_ctx_vec, E_wrd_vec)
-        y_association = get_1storder_association_metric(y, A_terms, B_terms, we_model, E_ctx_vec, E_wrd_vec)
+        x_association = get_1storder_association_metric(x, A_terms, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
+        y_association = get_1storder_association_metric(y, A_terms, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
         x_associations = np.append(x_associations, x_association)
         y_associations = np.append(y_associations, y_association)
     return np.sum(x_associations) - np.sum(y_associations)
@@ -127,9 +138,12 @@ def produce_1storder_p_value(we_model, X_terms, Y_terms, A_terms, B_terms, E_ctx
     notebooks for experimentation.'''
     x_union_y = set(X_terms).union(set(Y_terms))
     total_terms = len(x_union_y)
-    comparison_statistic = produce_1storder_test_statistic(we_model, X_terms, Y_terms, A_terms, B_terms, E_ctx_vec, E_wrd_vec)
+    [X_terms, Y_terms, A_terms, B_terms] = [tuple(x) for x in [X_terms, Y_terms, A_terms, B_terms]]
+    E_ctx_vec_tup = tuple(E_ctx_vec)
+    E_wrd_vec_tup = tuple(E_wrd_vec)
+    comparison_statistic = produce_1storder_test_statistic(we_model, X_terms, Y_terms, A_terms, B_terms, E_ctx_vec_tup, E_wrd_vec_tup)
     dist = np.array([])
     for (X_i_terms, Y_i_terms) in tqdm(get_complements(x_union_y), total=num_combinations(total_terms, total_terms/2)):
-        test_statistic = produce_1storder_test_statistic(we_model, X_i_terms, Y_i_terms, A_terms, B_terms, E_ctx_vec, E_wrd_vec)
+        test_statistic = produce_1storder_test_statistic(we_model, X_i_terms, Y_i_terms, A_terms, B_terms, E_ctx_vec_tup, E_wrd_vec_tup)
         dist = np.append(dist, test_statistic)
     return 1 - sp.stats.norm.cdf(comparison_statistic, loc=np.mean(dist), scale=np.std(dist, ddof=1))
