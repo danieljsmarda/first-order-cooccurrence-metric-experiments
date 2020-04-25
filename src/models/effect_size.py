@@ -89,8 +89,8 @@ def get_expSG_vecs(words, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
 
 @lru_cache(maxsize=None)
 def get_expSG_1storder_relation(word_from, words_to, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
-    E_ctx_vec = np.array(E_ctx_vec_tup)
-    E_wrd_vec = np.array(E_wrd_vec_tup)
+    #E_ctx_vec = np.array(E_ctx_vec_tup)
+    #E_wrd_vec = np.array(E_wrd_vec_tup)
     expSG_vec = get_expSG_vecs(tuple([word_from]), we_model, E_ctx_vec_tup, E_wrd_vec_tup)[word_from]
     
     relations={}
@@ -103,8 +103,8 @@ def get_expSG_1storder_relation(word_from, words_to, we_model, E_ctx_vec_tup, E_
 
 @lru_cache(maxsize=None)
 def get_1storder_association_metric(word, A_terms, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
-    E_ctx_vec = np.array(E_ctx_vec_tup)
-    E_wrd_vec = np.array(E_wrd_vec_tup)
+    #E_ctx_vec = np.array(E_ctx_vec_tup)
+    #E_wrd_vec = np.array(E_wrd_vec_tup)
     A_relations = get_expSG_1storder_relation(word, A_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
     B_relations = get_expSG_1storder_relation(word, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
     return mean(A_relations.values()) - mean(B_relations.values())
