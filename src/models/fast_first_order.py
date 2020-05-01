@@ -40,3 +40,8 @@ def get_expSG_1storder_relation_no_cache_NEW_ALLWORDS(words_to, we_model):
     relations = sp.special.expit(np.dot(_vecs, ctx_vecs.T))
     
     return relations
+
+def get_1storder_association_metric_fast(word, A_terms, B_terms, we_model):
+    A_relations = get_expSG_1storder_relation_no_cache_NEW(word, A_terms, we_model)
+    B_relations = get_expSG_1storder_relation_no_cache_NEW(word, B_terms, we_model)
+    return mean(A_relations) - mean(B_relations)
