@@ -23,8 +23,14 @@ def calculate_association_metric_for_target_word(word_vec, A_mtx, B_mtx):
     '''Computes the association metric, s(w,A,B).
     word_vec: 1-D word vector
     A_mtx, B_mtx: 2-D word vector arrays'''
-    A_cosines = np.apply_along_axis(lambda row: 1-cosine_distance(row, word_vec), 1, A_mtx)
-    B_cosines = np.apply_along_axis(lambda row: 1-cosine_distance(row, word_vec), 1, B_mtx)
+    #A_cosines_apply = np.apply_along_axis(lambda row: 1-cosine_distance(row, word_vec), 1, A_mtx)
+    #B_cosines_apply = np.apply_along_axis(lambda row: 1-cosine_distance(row, word_vec), 1, B_mtx)
+    A_dot_v = np.dot(A_mtx, word_vec)
+    B_dot_v = np.dot(B_mtx, word_vec)
+    A_norms = np.multiply(np.linalg.norm(A_mtx, axis=1), np.linalg.norm(word_vec))
+    B_norms = np.multiply(np.linalg.norm(B_mtx, axis=1), np.linalg.norm(word_vec))
+    A_cosines = np.divide(A_dot_v, A_norms)
+    B_cosines = np.divide(B_dot_v, B_norms)
     return np.mean(A_cosines) - np.mean(B_cosines)
 
 def calculate_effect_size(X_mtx, Y_mtx, A_mtx, B_mtx):
