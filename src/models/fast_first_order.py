@@ -1,13 +1,8 @@
-from gensim.test.utils import datapath
-from gensim.models import KeyedVectors
-from scipy.spatial.distance import cosine as cosine_distance
-from scipy.special import comb as num_combinations
 from itertools import combinations
-from functools import lru_cache
 from tqdm import tqdm
-from statistics import mean
 import numpy as np
 import scipy as sp
+from sklearn.preprocessing import MinMaxScaler
 
 def get_complements(x_union_y):
     '''Generator function that yields pairs of equal-size disjoint subsets
@@ -44,4 +39,25 @@ def get_expSG_1storder_relation_no_cache_NEW_ALLWORDS(words_to, we_model):
 def get_1storder_association_metric_fast(word, A_terms, B_terms, we_model):
     A_relations = get_expSG_1storder_relation_no_cache_NEW(word, A_terms, we_model)
     B_relations = get_expSG_1storder_relation_no_cache_NEW(word, B_terms, we_model)
-    return mean(A_relations) - mean(B_relations)
+    return np.mean(A_relations) - np.mean(B_relations)
+
+def get_all_relations_1storder(A_terms, B_terms, we_model):
+    A_relations=get_expSG_1storder_relation_no_cache_NEW_ALLWORDS(A_terms, we_model)
+    B_relations=get_expSG_1storder_relation_no_cache_NEW_ALLWORDS(B_terms, we_model)
+    all_associations = np.mean(A_relations, axis=1) - np.mean(B_relations, axis=1)
+    return all_associations
+
+def get_1storder_association_metric_list_for_target_list(target_list, A_terms, B_terms, we_model):
+    global ORDER
+    ORDER = 'first'
+    
+    associations = np.array([])
+    for word in tqdm(target_list):
+        association = get_1storder_association_metric_fast(word, A_terms, B_terms, we_model)
+        associations = np.append(associations, association)
+    
+    scaler = MinMaxScaler(feature_range=(-1,1))
+    all_associations = get_all_relations_1storder(A_terms, B_terms, we_model)
+    scaler.fit(all_associations.reshape(-1,1)) # Reshape is for a single feature, NOT for a single sample
+    transformed = scaler.transform(associations.reshape(-1,1))
+    return transformed.reshape(len(transformed))
