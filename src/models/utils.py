@@ -16,8 +16,8 @@ def save_array(FILEPATH, arr, exp_num, order, list_name):
     exp_name = str(order)+'_order_'+list_name
     results_dict[exp_num][exp_name] = arr
     save_pickle(results_dict, FILEPATH)
-    print(f'Results array successfully saved to file {FILEPATH} under\
- keys [{exp_num}][{exp_name}]')
+    print(f"Results array successfully saved to file {FILEPATH} under\
+ keys [{exp_num}]['{exp_name}']")
 
 def filter_terms_not_in_wemodel(we_model, X_terms, Y_terms):
     term_list_names = ['first_list', 'second_list']
