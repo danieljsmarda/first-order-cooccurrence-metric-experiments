@@ -1,4 +1,6 @@
 import pickle
+import numpy as np
+from collections import defaultdict
 
 def save_pickle(obj, FILEPATH):
     f = open(FILEPATH, 'wb')
@@ -11,7 +13,21 @@ def open_pickle(FILEPATH):
     f.close()
     return obj
 
-def save_array(FILEPATH, arr, exp_num, order, list_name):
+def save_arrays(FILEPATH, exp_num, order, X_metrics, Y_metrics, threshold):
+    results_dict = open_pickle(FILEPATH)
+    results_dict[exp_num] = results_dict.get(exp_num, defaultdict(dict))
+    order_dict = results_dict[exp_num].get(order, {})
+    order_dict['X_array'] = X_metrics
+    order_dict['Y_array'] = Y_metrics
+    order_dict['X_mean'] = np.mean(X_metrics)
+    order_dict['Y_mean'] = np.mean(Y_metrics)
+    order_dict['threshold'] = threshold
+    results_dict[exp_num][order] = order_dict
+    save_pickle(results_dict, FILEPATH)
+    print(f"Results array successfully saved to file {FILEPATH} under\
+ keys [{exp_num}][{order}]")
+
+def save_array_old(FILEPATH, arr, exp_num, order, list_name):
     results_dict = open_pickle(FILEPATH)
     exp_name = str(order)+'_order_'+list_name
     results_dict[exp_num][exp_name] = arr
