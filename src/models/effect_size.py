@@ -24,8 +24,6 @@ def calculate_association_metric_for_target_word(word_vec, A_mtx, B_mtx):
     '''Computes the association metric, s(w,A,B).
     word_vec: 1-D word vector
     A_mtx, B_mtx: 2-D word vector arrays'''
-    #A_cosines_apply = np.apply_along_axis(lambda row: 1-cosine_distance(row, word_vec), 1, A_mtx)
-    #B_cosines_apply = np.apply_along_axis(lambda row: 1-cosine_distance(row, word_vec), 1, B_mtx)
     A_dot_v = np.dot(A_mtx, word_vec)
     B_dot_v = np.dot(B_mtx, word_vec)
     A_norms = np.multiply(np.linalg.norm(A_mtx, axis=1), np.linalg.norm(word_vec))
@@ -114,8 +112,7 @@ def get_expSG_vecs(words, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
 
 @lru_cache(maxsize=None)
 def get_expSG_1storder_relation(word_from, words_to, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
-    #E_ctx_vec = np.array(E_ctx_vec_tup)
-    #E_wrd_vec = np.array(E_wrd_vec_tup)
+
     expSG_vec = get_expSG_vecs(tuple([word_from]), we_model, E_ctx_vec_tup, E_wrd_vec_tup)[word_from]
     
     relations={}
@@ -128,8 +125,7 @@ def get_expSG_1storder_relation(word_from, words_to, we_model, E_ctx_vec_tup, E_
 
 @lru_cache(maxsize=None)
 def get_1storder_association_metric(word, A_terms, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup):
-    #E_ctx_vec = np.array(E_ctx_vec_tup)
-    #E_wrd_vec = np.array(E_wrd_vec_tup)
+
     A_relations = get_expSG_1storder_relation(word, A_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
     B_relations = get_expSG_1storder_relation(word, B_terms, we_model, E_ctx_vec_tup, E_wrd_vec_tup)
     return mean(A_relations.values()) - mean(B_relations.values())
