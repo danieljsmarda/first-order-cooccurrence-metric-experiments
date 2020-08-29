@@ -1,6 +1,3 @@
-from gensim.test.utils import datapath
-from gensim.models import KeyedVectors
-from scipy.spatial.distance import cosine as cosine_distance
 from scipy.special import comb as num_combinations
 from itertools import combinations
 from functools import lru_cache
