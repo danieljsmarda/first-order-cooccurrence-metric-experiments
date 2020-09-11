@@ -6,6 +6,7 @@ from statistics import mean
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import scipy as sp
+import operator
 
 def word_set_to_mtx(wv_obj, word_set):
     '''Converts set of string words into a 2-D numpy array of word vectors from the word-vector object.'''
@@ -15,7 +16,12 @@ def get_matrices_from_term_lists(wv_obj, X_terms, Y_terms, A_terms, B_terms):
     '''Uses wv_obj to convert lists of words to arrays of word vectors.
     Returns: list of matrices containing the corresponding vectors for 
     the words in X_terms, Y_terms, A_terms, and B_terms.'''
-    return [word_set_to_mtx(wv_obj, terms) for terms in [X_terms, Y_terms, A_terms, B_terms]]
+    X_getter = operator.itemgetter(*X_terms)
+    Y_getter = operator.itemgetter(*Y_terms)
+    A_getter = operator.itemgetter(*A_terms)
+    B_getter = operator.itemgetter(*B_terms)
+    return [np.vstack(getter(wv_obj.wv)) for getter in [X_getter, Y_getter, A_getter, B_getter]]
+    
 
 def calculate_association_metric_for_target_word(word_vec, A_mtx, B_mtx):
     '''Computes the association metric, s(w,A,B).
