@@ -34,6 +34,21 @@ def save_arrays(FILEPATH, exp_num, order, X_metrics, Y_metrics, threshold,
     print(f"Results array successfully saved to file {FILEPATH} under\
  keys [{exp_num}][{order}]")
 
+def save_experiment_arbitrary_label(filepath, exp_num, order, label, data, display=None):
+    results_dict = open_pickle(filepath)
+    results_dict[exp_num] = results_dict.get(exp_num, defaultdict(dict))
+    order_dict = results_dict[exp_num].get(order, {})
+    order_dict[label] = data
+    results_dict[exp_num][order] = order_dict
+    save_pickle(results_dict, filepath)
+    if display == 'all':
+        print(f'FULL RESULTS DICT FOR EXP {exp_num}', results_dict[exp_num])
+    elif display == 'some':
+        print(f'SPECIFIC RESULTS FOR EXP {exp_num}, LABEL "{label}": \
+        {results_dict[exp_num][order][label]}')
+    print(f"Results array successfully saved to file {filepath} under\
+    keys [{exp_num}][{order}][{label}]")
+
 def save_array_old(FILEPATH, arr, exp_num, order, list_name):
     results_dict = open_pickle(FILEPATH)
     exp_name = str(order)+'_order_'+list_name
