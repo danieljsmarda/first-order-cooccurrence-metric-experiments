@@ -70,6 +70,7 @@ def produce_2ndorder_effect_size(wv_obj, X_terms, Y_terms, A_terms, B_terms):
 ########## p-values ###########
 
 def produce_test_statistic(wv_obj, X_terms, Y_terms, A_terms, B_terms):
+    # THIS IS A DEPRECATED FUNCTION
     '''Calculates test statistic s(X,Y,A,B).'''
     [X_mtx, Y_mtx, A_mtx, B_mtx] = get_matrices_from_term_lists(wv_obj, X_terms, Y_terms, A_terms, B_terms)
     x_associations = np.apply_along_axis(lambda x_vec: calculate_association_metric_for_target_word(x_vec, A_mtx, B_mtx), 1, X_mtx)
@@ -85,6 +86,7 @@ def get_complements(x_union_y):
         yield (seq, complement)
 
 def produce_2ndorder_p_value(wv_obj, X_terms, Y_terms, A_terms, B_terms):
+    # THIS IS A DEPRECATED FUNCTION
     '''Generates the p-value for a set of terms with the word-vector object.
     High-level function; this function should be directly imported into 
     notebooks for experimentation.'''

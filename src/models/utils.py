@@ -49,6 +49,12 @@ def save_experiment_arbitrary_label(filepath, exp_num, order, label, data, displ
     print(f"Results array successfully saved to file {filepath} under\
     keys [{exp_num}][{order}][{label}]")
 
+def save_scalers(filepath, exp_num, order, scaler): 
+    results_dict = open_pickle(filepath)
+    results_dict[exp_num] = results_dict.get(exp_num, defaultdict(dict))
+    results_dict[exp_num][order] = scaler
+    save_pickle(results_dict, filepath)
+
 def save_array_old(FILEPATH, arr, exp_num, order, list_name):
     results_dict = open_pickle(FILEPATH)
     exp_name = str(order)+'_order_'+list_name
