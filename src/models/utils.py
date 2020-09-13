@@ -30,7 +30,6 @@ def save_arrays(FILEPATH, exp_num, order, X_metrics, Y_metrics, threshold,
     order_dict['upper_bound'] = upper_bound
     results_dict[exp_num][order] = order_dict
     save_pickle(results_dict, FILEPATH)
-    print(f'RESULTS DICT FOR EXP {exp_num}', results_dict[exp_num])
     print(f"Results array successfully saved to file {FILEPATH} under\
  keys [{exp_num}][{order}]")
 
