@@ -23,11 +23,11 @@ def save_arrays(FILEPATH, exp_num, order, X_metrics, Y_metrics, threshold,
     order_dict['X_mean'] = np.mean(X_metrics)
     order_dict['Y_mean'] = np.mean(Y_metrics)
     order_dict['threshold'] = threshold
-    order_dict['pct_5'] = pct_5
-    order_dict['pct_95'] = pct_95
-    order_dict['A_biases'] = A_biases
-    order_dict['lower_bound'] = lower_bound
-    order_dict['upper_bound'] = upper_bound
+    #order_dict['pct_5'] = pct_5
+    #order_dict['pct_95'] = pct_95
+    #order_dict['A_biases'] = A_biases
+    #order_dict['lower_bound'] = lower_bound
+    #order_dict['upper_bound'] = upper_bound
     results_dict[exp_num][order] = order_dict
     save_pickle(results_dict, FILEPATH)
     print(f"Results array successfully saved to file {FILEPATH} under\
