@@ -179,13 +179,16 @@ X_label = 'Male Names'
 Y_label = 'Female Names'
 A_label = 'Career'
 B_label = 'Family'
-X_terms = ['John', 'Paul','Mike','Kevin','Steve','Greg','Jeff','Bill']
-Y_terms = ['Amy','Joan','Lisa','Sarah','Diana','Kate','Ann','Donna']
+X_terms = ['john', 'paul','mike','kevin','steve','greg','jeff','bill']
+Y_terms = ['amy','joan','lisa','sarah','diana','kate','ann','donna']
 A_terms = ['executive','management','professional','corporation',
                'salary','office','business','career']
 B_terms = ['home','parents','children','family',
                'cousins','marriage','wedding','relatives']
-[X_terms, Y_terms, A_tersm, B_terms] = [[str.lower(term) for term in terms] for terms in [X_terms, Y_terms, A_terms, B_terms]]
+
+X_terms = [s.capitalize() for s in X_terms if s not in X_italics]
+Y_terms = [s.capitalize() for s in Y_terms if s not in Y_italics]
+#[X_terms, Y_terms, A_tersm, B_terms] = [[str.lower(term) for term in terms] for terms in [X_terms, Y_terms, A_terms, B_terms]]
 X_terms, Y_terms = filter_terms_not_in_wemodel(we_model, X_terms, Y_terms)
 A_terms, B_terms = filter_terms_not_in_wemodel(we_model, A_terms, B_terms)
 add_experiment_definition(exp_num, X_terms, Y_terms, A_terms, B_terms, 
