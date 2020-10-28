@@ -195,7 +195,7 @@ add_experiment_definition(exp_num, X_terms, Y_terms, A_terms, B_terms,
                           X_label, Y_label, A_label, B_label, EXPERIMENT_DEFINITION_PATH)
 
 
-# WEAT 7 using Google News word2vec model
+# WEAT 7 
 exp_num = 7
 X_label = 'Math'
 Y_label = 'Arts'
